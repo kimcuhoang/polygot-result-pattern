@@ -1,0 +1,47 @@
+@url = http://localhost:5001/users
+
+### 201
+POST {{url}} HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "test@email.com"
+}
+
+### 400
+POST {{url}} HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "aa"
+}
+
+### 406
+POST {{url}} HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "not-accept@email.com"
+}
+
+### 409
+POST {{url}} HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "duplicate@email.com"
+}
+
+### 500
+POST {{url}} HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "exception@email.com"
+}
+
+### 200
+GET {{url}}?email=success@email.com HTTP/1.1
+
+### 404
+GET {{url}}?email=notfound@email.com HTTP/1.1
