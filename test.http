@@ -1,4 +1,4 @@
-@url = http://localhost:5001/users
+@url = http://localhost:3000/users
 
 ### 201
 POST {{url}} HTTP/1.1

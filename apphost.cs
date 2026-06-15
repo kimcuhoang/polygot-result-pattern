@@ -7,10 +7,20 @@
 using Aspire.Hosting;
 using Microsoft.Extensions.Configuration;
 
-var builder = DistributedApplication.CreateBuilder(args);
+Environment.SetEnvironmentVariable("ASPIRE_DCP_USE_DEVELOPER_CERTIFICATE", "false");
+Environment.SetEnvironmentVariable("ASPIRE_ALLOW_UNSECURED_TRANSPORT", "true");
+
+var options = new DistributedApplicationOptions
+{
+    Args = args,
+    AllowUnsecuredTransport = true,       // Bypasses HTTP restrictions natively
+    TrustDeveloperCertificate = false     // Explicitly disables searching for/validating trusted local dev-certs
+
+};
+
+var builder = DistributedApplication.CreateBuilder(options);
 
 // 1. Force the AppHost and Dashboard to run entirely on HTTP without launchSettings
-builder.Configuration["ASPIRE_ALLOW_UNSECURED_TRANSPORT"] = "true";
 builder.Configuration["ASPIRE_DASHBOARD_OTLP_ENDPOINT_URL"] = "http://localhost:18889";
 builder.Configuration["ASPIRE_APP_HOST_OTLP_ENDPOINT_URL"] = "http://localhost:18889";
 builder.Configuration["ASPNETCORE_URLS"] = "http://localhost:18888";
@@ -18,7 +28,7 @@ builder.Configuration["ASPNETCORE_URLS"] = "http://localhost:18888";
 // 2. Configure dashboard without token
 builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
 {
-    ["AppHost:BrowserToken"] = "",
+    ["AppHost:BrowserToken"] = ""
 });
 
 var csharpApp = builder

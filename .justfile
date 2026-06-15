@@ -15,4 +15,5 @@ aspire command *options:
     dotnet aspire {{command}} {{options}}
 
 run:
-    dotnet run apphost.cs --no-launch-profile
+    dotnet aspire run
+    # dotnet run apphost.cs --no-launch-profile
