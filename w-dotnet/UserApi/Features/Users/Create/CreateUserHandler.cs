@@ -1,6 +1,8 @@
 using FluentValidation;
 using MediatR;
+using UserApi.Infrastructures.EntityFramework;
 using UserApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace UserApi.Features.Users.Create;
 
@@ -18,7 +20,7 @@ internal class CreateUserCommandValidator: AbstractValidator<CreateUserCommand>
     }
 }
 
-internal class CreateUserHandler : IRequestHandler<CreateUserCommand, Result>
+internal class CreateUserHandler(UserDbContext dbContext) : IRequestHandler<CreateUserCommand, Result>
 {
     public async Task<Result> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
@@ -28,8 +30,9 @@ internal class CreateUserHandler : IRequestHandler<CreateUserCommand, Result>
         {
             return Result.Failure(Reason.NotAcceptable("This email address is not acceptable."));
         }
-
-        if (payload.Email == "duplicate@email.com")
+        
+        var emailHasBeenTaken = await dbContext.Users.AnyAsync(u => u.Email == payload.Email, cancellationToken);
+        if (emailHasBeenTaken)
         {
             return Result.Failure(Reason.Conflict("This email address is already in use."));
         }
@@ -38,7 +41,6 @@ internal class CreateUserHandler : IRequestHandler<CreateUserCommand, Result>
         {
             throw new Exception("An unexpected error occurred.");
         }
-
 
         return Result.Success();
     }

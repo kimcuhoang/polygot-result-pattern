@@ -60,3 +60,21 @@ build:
 
 run: build
     dotnet run --no-launch-profile --project UserApi/UserApi.csproj
+
+ef-add name:
+    dotnet ef migrations add {{name}} \
+        --project UserApi/UserApi.csproj \
+        --startup-project UserApi/UserApi.csproj \
+        -c UserDbContext \
+        --output-dir Infrastructures/EntityFramework/Migrations
+
+ef-bundle-generate:
+    dotnet ef migrations bundle \
+        --project UserApi/UserApi.csproj \
+        --startup-project UserApi/UserApi.csproj \
+        -c UserDbContext \
+        -o deploy/userdb-postgres.exe --force
+
+ef-bundle-run: ef-bundle-generate
+    clear
+    deploy/userdb-postgres.exe --verbose --connection "Host=localhost;Port=5432;Database=dotnet-result-pattern;Username=postgres;Password=postgres"
