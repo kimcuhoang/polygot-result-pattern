@@ -2,8 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { initializeTransactionalContext, StorageDriver } from 'typeorm-transactional';
 
 async function bootstrap() {
+
+  initializeTransactionalContext({
+    storageDriver: StorageDriver.ASYNC_LOCAL_STORAGE
+  });
+
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
