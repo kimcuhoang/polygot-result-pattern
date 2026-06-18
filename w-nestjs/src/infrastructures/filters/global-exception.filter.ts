@@ -39,6 +39,17 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 		} else if (exception instanceof Error) {
 			this.logger.error('Unhandled System Exception:', exception.stack);
 			title = 'An internal server error occurred.';
+
+			(request as any).err = exception;
+			if ((request as any).raw) {
+				(request as any).raw.err = exception;
+			}
+
+			// pino-http looks heavily at the response object during res.end()
+			(response as any).err = exception;
+			if ((response as any).raw) {
+				(response as any).raw.err = exception;
+			}
 		}
 
 		const traceId = request.headers['x-request-id'] ?? `00-${this.generateTraceId()}-00`;
