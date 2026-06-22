@@ -21,7 +21,7 @@ add-readme:
 
 start-initialization:
     dotnet new gitignore --force
-    dotnet new globaljson --sdk-version 10.0.300 --roll-forward patch --force
+    dotnet new globaljson --sdk-version 10.0.301 --roll-forward patch --force
     dotnet new buildprops --force
     dotnet new sln --name UserApi --force
     dotnet new webapi -minimal --no-https --no-restore --force -o UserApi

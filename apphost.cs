@@ -1,4 +1,4 @@
-#:sdk Aspire.AppHost.Sdk@13.4.3
+#:sdk Aspire.AppHost.Sdk@13.4.6
 #pragma warning disable ASPIRECSHARPAPPS001
 
 // #:package Aspire.Hosting.JavaScript@13.4.3

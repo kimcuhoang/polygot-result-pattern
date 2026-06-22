@@ -12,8 +12,10 @@ dnt command package:
 # dotnet aspire new aspire-empty -n polygot --language csharp --non-interactive --suppress-agent-init
 
 aspire command *options:
+    clear
     dotnet aspire {{command}} {{options}}
 
 run:
+    clear
     dotnet aspire run
     # dotnet run apphost.cs --no-launch-profile
