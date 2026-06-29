@@ -3,12 +3,14 @@ using MediatR;
 using UserApi.Infrastructures.EntityFramework;
 using UserApi.Models;
 using Microsoft.EntityFrameworkCore;
+using UserApi.Domains;
+using EntityFramework.Exceptions.Common;
 
 namespace UserApi.Features.Users.Create;
 
-public record CreateUserCommand(CreateUserPayload Payload) : IRequest<Result> {}
+public record CreateUserCommand(CreateUserPayload Payload) : IRequest<Result> { }
 
-internal class CreateUserCommandValidator: AbstractValidator<CreateUserCommand>
+internal class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 {
     public CreateUserCommandValidator(IValidator<CreateUserPayload> payloadValidator)
     {
@@ -26,20 +28,31 @@ internal class CreateUserHandler(UserDbContext dbContext) : IRequestHandler<Crea
     {
         var payload = request.Payload;
 
-        if (payload.Email == "not-accept@email.com")
+        return payload.Email switch
         {
-            return Result.Failure(Reason.NotAcceptable("This email address is not acceptable."));
-        }
-        
-        var emailHasBeenTaken = await dbContext.Users.AnyAsync(u => u.Email == payload.Email, cancellationToken);
-        if (emailHasBeenTaken)
-        {
-            return Result.Failure(Reason.Conflict("This email address is already in use."));
-        }
+            "exception@email.com" => throw new Exception("An unexpected error occurred."),
+            "not-accept@email.com" => Result.Failure(Reason.NotAcceptable("This email address is not acceptable.")),
+            _ => await HandleEmailCheckAsync(payload, cancellationToken)
+        };
+    }
 
-        if (payload.Email == "exception@email.com")
+    private async Task<Result> HandleEmailCheckAsync(CreateUserPayload payload, CancellationToken cancellationToken)
+    {
+        try
         {
-            throw new Exception("An unexpected error occurred.");
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                Name = payload.Name,
+                Email = payload.Email
+            };
+
+            dbContext.Users.Add(user);
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (UniqueConstraintException ex)
+        {
+            return Result.Failure(Reason.Conflict($"A user with {string.Join(", ", ex.ConstraintProperties)} already exists."));
         }
 
         return Result.Success();

@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="EFCore.NamingConventions" Version="10.0.1" />
+    <PackageVersion Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="10.0.1" />
     <PackageVersion Include="FluentValidation" Version="8.3.0" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageVersion Include="MediatR" Version="[12.5.0]" />

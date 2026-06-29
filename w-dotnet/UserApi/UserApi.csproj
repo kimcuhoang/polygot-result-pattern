@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="EFCore.NamingConventions" />
+    <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />

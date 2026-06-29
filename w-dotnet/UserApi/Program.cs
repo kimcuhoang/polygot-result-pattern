@@ -75,6 +75,7 @@ builder.Services
     })
     .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly(), includeInternalTypes: true)
     .AddExceptionHandler<ValidationExceptionHandler>()
+    .AddExceptionHandler<DbUpdateExceptionHandler>()
     .AddExceptionHandler<UnexpectedExceptionHandler>()
     .AddValidation()
     .AddProblemDetails(options =>

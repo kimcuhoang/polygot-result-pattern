@@ -23,6 +23,12 @@ namespace UserApi.Infrastructures.EntityFramework.Migrations
                 {
                     table.PrimaryKey("pk_users", x => x.id);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_email",
+                table: "users",
+                column: "email",
+                unique: true);
         }
 
         /// <inheritdoc />

@@ -12,7 +12,7 @@ using UserApi.Infrastructures.EntityFramework;
 namespace UserApi.Infrastructures.EntityFramework.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20260616074902_Init")]
+    [Migration("20260629064006_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -46,6 +46,10 @@ namespace UserApi.Infrastructures.EntityFramework.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_users");
+
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_email");
 
                     b.ToTable("users", (string)null);
                 });

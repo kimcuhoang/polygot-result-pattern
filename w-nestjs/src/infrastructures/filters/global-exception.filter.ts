@@ -1,5 +1,6 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { QueryFailedError } from 'typeorm';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -36,8 +37,45 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 				detail = resPayload;
 				title = this.getStatusTitle(status);
 			}
-		} else if (exception instanceof Error) {
-			this.logger.error('Unhandled System Exception:', exception.stack);
+		} else if (exception instanceof QueryFailedError) {
+			const driver = (exception as any).driverError as any ?? {};
+			const code = driver?.code ?? driver?.errno ?? driver?.name ?? 'UNKNOWN'; // pg | mysql | generic
+
+			switch (code) {
+				case "23502": // PostgreSQL not-null violation
+					status = HttpStatus.BAD_REQUEST;
+					title = 'Bad Request';
+					detail = driver?.constraint ?? 'A required field is missing.';
+					break;
+
+				case "23503": // PostgreSQL foreign key violation
+					status = HttpStatus.BAD_REQUEST;
+					title = 'Bad Request';
+					detail = driver?.constraint ?? 'The operation violates a foreign key constraint.';
+					break;
+
+				case "23505": // PostgreSQL unique violation
+					status = HttpStatus.CONFLICT;
+					title = 'Conflict';
+					detail = driver?.constraint ?? 'A record with the same unique identifier already exists.';
+					break;
+
+				case "40001": // serialization_failure
+				case "40P01": // deadlock_detected
+					status = HttpStatus.SERVICE_UNAVAILABLE;
+					title = 'Temporary database issue. Please try again later.';
+					detail = 'The operation could not be completed due to a database conflict. Please try again.';
+					break;
+
+				default:
+					this.logger.error('Unhandled Database Exception:', exception.stack);
+					title = 'An internal server error occurred.';
+					detail = driver?.message ?? exception.message;
+					break;
+			}
+
+		} else {
+			this.logger.error('Unhandled System Exception:', exception instanceof Error ? exception.stack : String(exception));
 			title = 'An internal server error occurred.';
 
 			(request as any).err = exception;
