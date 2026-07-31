@@ -2,6 +2,17 @@
 default:
     just --list
 
+dotnet-tool-install:
+    dotnet tool install --local dotnet-ef
+    dotnet tool install --local centralisedpackageconverter
+    dotnet tool install --local dotnet-outdated-tool
+
+dotnet-tools-update:
+    dotnet tool update --all
+
+update-outdated-packages:
+    dotnet outdated -u
+
 add-readme:
     echo "Creating README.md..."
     echo '# UserApi' > README.md
